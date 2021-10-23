@@ -67,13 +67,13 @@ namespace APC.Liasons
             var assembly = Assembly.GetAssembly(typeof(Program))?.GetName() ?? new AssemblyName();
             var mapping = new[]
             {
-                new { Sensor = nameof(Resource.BCharge), Type = Const.SENSOR, UOM = "%" },
-                new { Sensor = nameof(Resource.BattV), Type = Const.SENSOR, UOM = "V" },
-                new { Sensor = nameof(Resource.LastXfer), Type = Const.SENSOR, UOM = "", },
-                new { Sensor = nameof(Resource.LoadPct), Type = Const.SENSOR, UOM = "%" },
-                new { Sensor = nameof(Resource.TimeLeft), Type = Const.SENSOR, UOM = "Mins" },
-                new { Sensor = nameof(Resource.Status), Type = Const.SENSOR, UOM = "" },
-                new { Sensor = nameof(Resource.NumXfers), Type = Const.SENSOR, UOM = "" },
+                new { Sensor = nameof(Resource.BCharge), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
+                new { Sensor = nameof(Resource.BattV), Type = Const.SENSOR, UOM = "V", Icon = "mdi:flash" },
+                new { Sensor = nameof(Resource.LastXfer), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
+                new { Sensor = nameof(Resource.LoadPct), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
+                new { Sensor = nameof(Resource.TimeLeft), Type = Const.SENSOR, UOM = "Mins", Icon = "mdi:clock-alert" },
+                new { Sensor = nameof(Resource.Status), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
+                new { Sensor = nameof(Resource.NumXfers), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
             };
 
             foreach (var input in this.Questions)
@@ -87,6 +87,14 @@ namespace APC.Liasons
                         discovery = discovery with
                         {
                             UnitOfMeasurement = map.UOM,
+                        };
+                    }
+
+                    if (!string.IsNullOrEmpty(map.Icon))
+                    {
+                        discovery = discovery with
+                        {
+                            Icon = map.Icon,
                         };
                     }
 

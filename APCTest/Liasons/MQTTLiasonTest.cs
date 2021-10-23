@@ -14,19 +14,19 @@ namespace APCTest.Liasons
     [TestClass]
     public class MQTTLiasonTest
     {
-        //[TestMethod]
+        [TestMethod]
         public void MapDataTest()
         {
             var tests = new[] {
                 new {
                     Q = new SlugMapping { SerialNo = BasicSerialNo, Slug = BasicSlug },
-                    Resource = new Resource { SerialNo = BasicSerialNo, BattV = BasicBattV },
-                    Expected = new { SerialNo = BasicSerialNo, BattV = BasicBattV.ToString("N2"), Slug = BasicSlug }
+                    Resource = new Resource { SerialNo = BasicSerialNo, BCharge = BasicBCharge },
+                    Expected = new { SerialNo = BasicSerialNo, BCharge = BasicBCharge.ToString("0"), Slug = BasicSlug, Found = true}
                 },
                 new {
                     Q = new SlugMapping { SerialNo = BasicSerialNo, Slug = BasicSlug },
-                    Resource = new Resource { SerialNo = $"{BasicSerialNo}-fake" , BattV = BasicBattV },
-                    Expected = new { SerialNo = string.Empty, BattV = BasicBattV.ToString("N2"), Slug = string.Empty }
+                    Resource = new Resource { SerialNo = $"{BasicSerialNo}-fake" , BCharge = BasicBCharge },
+                    Expected = new { SerialNo = string.Empty, BCharge = BasicBCharge.ToString("0"), Slug = string.Empty, Found = false}
                 },
             };
 
@@ -41,15 +41,19 @@ namespace APCTest.Liasons
 
                 generator.Setup(x => x.BuildDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<System.Reflection.AssemblyName>(), false))
                     .Returns(new TwoMQTT.Models.MQTTDiscovery());
-                generator.Setup(x => x.StateTopic(test.Q.Slug, nameof(Resource.BattV)))
-                    .Returns($"totes/{test.Q.Slug}/topic/{nameof(Resource.BattV)}");
+                generator.Setup(x => x.StateTopic(test.Q.Slug, nameof(Resource.BCharge)))
+                    .Returns($"totes/{test.Q.Slug}/topic/{nameof(Resource.BCharge)}");
 
                 var mqttLiason = new MQTTLiason(logger.Object, generator.Object, sharedOpts);
                 var results = mqttLiason.MapData(test.Resource);
                 var actual = results.FirstOrDefault();
 
-                Assert.IsTrue(actual.topic.Contains(test.Expected.Slug), "The topic should contain the expected SerialNo.");
-                Assert.AreEqual(test.Expected.BattV, actual.payload, "The payload be the expected BattV.");
+                Assert.AreEqual(test.Expected.Found, results.Any(), "The mapping should exist if found.");
+                if (test.Expected.Found)
+                {
+                    Assert.IsTrue(actual.topic.Contains(test.Expected.Slug), "The topic should contain the expected SerialNo.");
+                    Assert.AreEqual(test.Expected.BCharge, actual.payload, "The payload be the expected BCharge.");
+                }
             }
         }
 
@@ -59,8 +63,8 @@ namespace APCTest.Liasons
             var tests = new[] {
                 new {
                     Q = new SlugMapping { SerialNo = BasicSerialNo, Slug = BasicSlug },
-                    Resource = new Resource { SerialNo = BasicSerialNo, BattV = BasicBattV },
-                    Expected = new { SerialNo = BasicSerialNo, BattV = BasicBattV, Slug = BasicSlug }
+                    Resource = new Resource { SerialNo = BasicSerialNo, BCharge = BasicBCharge },
+                    Expected = new { SerialNo = BasicSerialNo, BCharge = BasicBCharge, Slug = BasicSlug }
                 },
             };
 
@@ -73,7 +77,7 @@ namespace APCTest.Liasons
                     Resources = new[] { test.Q }.ToList(),
                 });
 
-                generator.Setup(x => x.BuildDiscovery(test.Q.Slug, nameof(Resource.BattV), It.IsAny<System.Reflection.AssemblyName>(), false))
+                generator.Setup(x => x.BuildDiscovery(test.Q.Slug, nameof(Resource.BCharge), It.IsAny<System.Reflection.AssemblyName>(), false))
                     .Returns(new TwoMQTT.Models.MQTTDiscovery());
 
                 var mqttLiason = new MQTTLiason(logger.Object, generator.Object, sharedOpts);
@@ -85,7 +89,7 @@ namespace APCTest.Liasons
         }
 
         private static string BasicSlug = "totallyaslug";
-        private static double BasicBattV = 28.2;
-        private static string BasicSerialNo = "5881ABCDEF.";
+        private static double BasicBCharge = 28;
+        private static string BasicSerialNo = "5881ABCDEF";
     }
 }

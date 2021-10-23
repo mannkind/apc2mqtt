@@ -23,7 +23,7 @@ namespace APCTest.Liasons
             var tests = new[] {
                 new {
                     Q = new SlugMapping { SerialNo = BasicSerialNo, Slug = BasicSlug },
-                    Expected = new { SerialNo = BasicSerialNo, BattV = BasicBattV }
+                    Expected = new { SerialNo = BasicSerialNo, BCharge = BasicBCharge }
                 },
             };
 
@@ -41,20 +41,20 @@ namespace APCTest.Liasons
                      .ReturnsAsync(new APC.Models.Source.Response
                      {
                          SerialNo = test.Expected.SerialNo,
-                         BattV = test.Expected.BattV,
+                         BCharge = test.Expected.BCharge,
                      });
 
                 var sourceLiason = new SourceLiason(logger.Object, sourceDAO.Object, opts, sharedOpts);
                 await foreach (var result in sourceLiason.ReceiveDataAsync())
                 {
                     Assert.AreEqual(test.Expected.SerialNo, result.SerialNo);
-                    Assert.AreEqual(test.Expected.BattV, result.BattV);
+                    Assert.AreEqual(test.Expected.BCharge, result.BCharge);
                 }
             }
         }
 
         private static string BasicSlug = "totallyaslug";
-        private static double BasicBattV = 28.2;
+        private static double BasicBCharge = 28;
         private static string BasicSerialNo = "15873525";
     }
 }
