@@ -16,7 +16,7 @@ jobs:
         with:
           dotnet_version: '6.0.x'
           project: APC
-          project_test: APCTest
+          test_project: APCTest
 
       - name: Upload coverage
         run: bash <(curl -s https://codecov.io/bash)
