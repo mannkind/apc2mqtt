@@ -55,10 +55,10 @@ public class SourceDAO : ISourceDAO
             var msg = e switch
             {
                 HttpRequestException => "Unable to fetch from the APC UPS server",
-                JsonException => "Unable to deserialize response from the APC UPS server",
+                KeyNotFoundException => "Unable to deserialize response from the APC UPS server",
                 _ => "Unable to send to the APC UPS server"
             };
-            this.Logger.LogError(msg + "; {exception}", e);
+            this.Logger.LogError(msg + " - {serial}; {exception}", key.SerialNo, e);
             return null;
         }
     }
