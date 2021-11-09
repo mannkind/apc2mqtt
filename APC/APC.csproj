@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="twomqtt" Version="0.12*" />
+    <PackageReference Include="twomqtt" Version="0.12.*" />
     <PackageReference Include="Apcupsd.NET" Version="1.*" />
   </ItemGroup>
 
