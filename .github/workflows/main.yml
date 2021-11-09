@@ -1,0 +1,56 @@
+name: Main Workflow
+on:
+  push:
+  pull_request:
+jobs:
+  all:
+    name: Build, Test, Deploy, Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - uses: mannkind/twomqtt/.github/actions/build-test-dotnet@main
+        id: build
+        with:
+          dotnet_version: '6.0.x'
+          project: APC
+          test_project: APCTest
+
+      - name: Upload coverage
+        run: bash <(curl -s https://codecov.io/bash)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      - uses: mannkind/twomqtt/.github/actions/build-docker@main
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          image: mannkind/apc2mqtt
+          tag: dev
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+      - uses: mannkind/twomqtt/.github/actions/build-docker@main
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          image: mannkind/apc2mqtt
+          tag: ${{ steps.build.outputs.version }}
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      - uses: mannkind/twomqtt/.github/actions/build-docker@main
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          image: mannkind/apc2mqtt
+          tag: latest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      - name: Tag and push the git release
+        run: |
+          git tag -f ${{ steps.build.outputs.version }}
+          git push --tags
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
