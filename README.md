@@ -46,12 +46,12 @@ APC__RESOURCES__#__SerialNo                 - The serial no. for a specific APC 
 APC__RESOURCES__#__Host                     - [OPTIONAL] The apcupsd host for a specific APC UPS, defaults to "localhost"
 APC__RESOURCES__#__Port                     - [OPTIONAL] The apcupsd port for a specific APC UPS, defaults to "3551"
 APC__RESOURCES__#__Slug                     - The slug to identify the specific host
-POLLING__POLLINGINTERVAL                    - [OPTIONAL] The delay between lookups, defaults to "0.00:01:07"
-POLLING__MQTT__TOPICPREFIX                  - [OPTIONAL] The MQTT topic on which to publish the collection lookup results, defaults to "home/apc"
-POLLING__MQTT__DISCOVERYENABLED             - [OPTIONAL] The MQTT discovery flag for Home Assistant, defaults to false
-POLLING__MQTT__DISCOVERYPREFIX              - [OPTIONAL] The MQTT discovery prefix for Home Assistant, defaults to "homeassistant"
-POLLING__MQTT__DISCOVERYNAME                - [OPTIONAL] The MQTT discovery name for Home Assistant, defaults to "apc"
-POLLING__MQTT__BROKER                       - [OPTIONAL] The MQTT broker, defaults to "test.mosquitto.org"
-POLLING__MQTT__USERNAME                     - [OPTIONAL] The MQTT username, default to ""
-POLLING__MQTT__PASSWORD                     - [OPTIONAL] The MQTT password, default to ""
+APC__POLLINGINTERVAL                    - [OPTIONAL] The delay between lookups, defaults to "0.00:01:07"
+APC__MQTT__TOPICPREFIX                  - [OPTIONAL] The MQTT topic on which to publish the collection lookup results, defaults to "home/apc"
+APC__MQTT__DISCOVERYENABLED             - [OPTIONAL] The MQTT discovery flag for Home Assistant, defaults to false
+APC__MQTT__DISCOVERYPREFIX              - [OPTIONAL] The MQTT discovery prefix for Home Assistant, defaults to "homeassistant"
+APC__MQTT__DISCOVERYNAME                - [OPTIONAL] The MQTT discovery name for Home Assistant, defaults to "apc"
+APC__MQTT__BROKER                       - [OPTIONAL] The MQTT broker, defaults to "test.mosquitto.org"
+APC__MQTT__USERNAME                     - [OPTIONAL] The MQTT username, default to ""
+APC__MQTT__PASSWORD                     - [OPTIONAL] The MQTT password, default to ""
 ```
