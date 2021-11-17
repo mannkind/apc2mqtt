@@ -55,4 +55,3 @@ APC__MQTT__BROKER                       - [OPTIONAL] The MQTT broker, defaults t
 APC__MQTT__USERNAME                     - [OPTIONAL] The MQTT username, default to ""
 APC__MQTT__PASSWORD                     - [OPTIONAL] The MQTT password, default to ""
 ```
- 
