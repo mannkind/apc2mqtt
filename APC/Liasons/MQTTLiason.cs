@@ -27,6 +27,7 @@ public class MQTTLiason : MQTTLiasonBase<Resource, object, SlugMapping, SharedOp
     public MQTTLiason(ILogger<MQTTLiason> logger, IMQTTGenerator generator, IOptions<SharedOpts> sharedOpts) :
         base(logger, generator, sharedOpts)
     {
+        this.DataReceivedExpiration = sharedOpts.Value.DataReceivedExpiration;
     }
 
     /// <inheritdoc />
@@ -47,14 +48,16 @@ public class MQTTLiason : MQTTLiasonBase<Resource, object, SlugMapping, SharedOp
         this.Logger.LogDebug("Found slug {slug} for incoming data for {serialNo}", slug, input.SerialNo);
         results.AddRange(new[]
             {
-                    (this.Generator.StateTopic(slug, nameof(Resource.BCharge)), input.BCharge.ToString("0")),
-                    (this.Generator.StateTopic(slug, nameof(Resource.BattV)), input.BattV.ToString("N2")),
-                    (this.Generator.StateTopic(slug, nameof(Resource.LastXfer)), input.LastXfer),
-                    (this.Generator.StateTopic(slug, nameof(Resource.LoadPct)), input.LoadPct.ToString("0")),
-                    (this.Generator.StateTopic(slug, nameof(Resource.TimeLeft)), input.TimeLeft.ToString("N1")),
-                    (this.Generator.StateTopic(slug, nameof(Resource.Status)), input.Status),
-                    (this.Generator.StateTopic(slug, nameof(Resource.NumXfers)), input.NumXfers.ToString("0")),
-                }
+                this.Generator.DataReceivedTopicPayload(slug),
+
+                (this.Generator.StateTopic(slug, nameof(Resource.BCharge)), input.BCharge.ToString("0")),
+                (this.Generator.StateTopic(slug, nameof(Resource.BattV)), input.BattV.ToString("N2")),
+                (this.Generator.StateTopic(slug, nameof(Resource.LastXfer)), input.LastXfer),
+                (this.Generator.StateTopic(slug, nameof(Resource.LoadPct)), input.LoadPct.ToString("0")),
+                (this.Generator.StateTopic(slug, nameof(Resource.TimeLeft)), input.TimeLeft.ToString("N1")),
+                (this.Generator.StateTopic(slug, nameof(Resource.Status)), input.Status),
+                (this.Generator.StateTopic(slug, nameof(Resource.NumXfers)), input.NumXfers.ToString("0")),
+            }
         );
 
         return results;
@@ -67,17 +70,19 @@ public class MQTTLiason : MQTTLiasonBase<Resource, object, SlugMapping, SharedOp
         var assembly = Assembly.GetAssembly(typeof(Program))?.GetName() ?? new AssemblyName();
         var mapping = new[]
         {
-                new { Sensor = nameof(Resource.BCharge), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
-                new { Sensor = nameof(Resource.BattV), Type = Const.SENSOR, UOM = "V", Icon = "mdi:flash" },
-                new { Sensor = nameof(Resource.LastXfer), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
-                new { Sensor = nameof(Resource.LoadPct), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
-                new { Sensor = nameof(Resource.TimeLeft), Type = Const.SENSOR, UOM = "Mins", Icon = "mdi:clock-alert" },
-                new { Sensor = nameof(Resource.Status), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
-                new { Sensor = nameof(Resource.NumXfers), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
-            };
+            new { Sensor = nameof(Resource.BCharge), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
+            new { Sensor = nameof(Resource.BattV), Type = Const.SENSOR, UOM = "V", Icon = "mdi:flash" },
+            new { Sensor = nameof(Resource.LastXfer), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
+            new { Sensor = nameof(Resource.LoadPct), Type = Const.SENSOR, UOM = "%", Icon = "mdi:gauge" },
+            new { Sensor = nameof(Resource.TimeLeft), Type = Const.SENSOR, UOM = "Mins", Icon = "mdi:clock-alert" },
+            new { Sensor = nameof(Resource.Status), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
+            new { Sensor = nameof(Resource.NumXfers), Type = Const.SENSOR, UOM = "", Icon = "mdi:information-outline" },
+        };
 
         foreach (var input in this.Questions)
         {
+            discoveries.Add(this.Generator.DataReceivedDiscovery(input.Slug, assembly, this.DataReceivedExpiration));
+
             foreach (var map in mapping)
             {
                 var discovery = this.Generator.BuildDiscovery(input.Slug, map.Sensor, assembly, false);
@@ -104,4 +109,9 @@ public class MQTTLiason : MQTTLiasonBase<Resource, object, SlugMapping, SharedOp
 
         return discoveries;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private readonly TimeSpan DataReceivedExpiration;
 }
