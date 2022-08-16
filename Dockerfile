@@ -14,3 +14,4 @@ RUN dotnet build -o output -c Release --no-restore -p:Version=$BUILD_VERSION APC
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS runtime
 COPY --from=build /src/output app
+ENTRYPOINT ["dotnet", "./app/APC.dll"]
